@@ -14,12 +14,17 @@ jobs:
       - name: 下载头文件
         run: git clone https://github.com/bmax121/KernelPatch.git
 
+      - name: 查找kpm.h位置
+        run: find ./KernelPatch -name "kpm.h"
+
       - name: 编译
         run: |
+          KPM_INCLUDE=$(dirname $(find ./KernelPatch -name "kpm.h" | head -1))
+          echo "头文件路径: $KPM_INCLUDE"
           aarch64-linux-gnu-gcc \
             -nostdlib -ffreestanding -fno-builtin \
             -march=armv8-a \
-            -I ./KernelPatch/kernel/patch/include \
+            -I "$KPM_INCLUDE" \
             -r \
             -o cpuinfo-exynos2600.kpm \
             cpuinfo-exynos2600.c

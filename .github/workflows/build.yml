@@ -1,0 +1,31 @@
+name: Build KPM
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 安装编译工具
+        run: sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: 下载头文件
+        run: git clone https://github.com/bmax121/KernelPatch.git
+
+      - name: 编译
+        run: |
+          aarch64-linux-gnu-gcc \
+            -nostdlib -ffreestanding -fno-builtin \
+            -march=armv8-a \
+            -I ./KernelPatch/kernel/patch/include \
+            -r \
+            -o cpuinfo-exynos2600.kpm \
+            cpuinfo-exynos2600.c
+
+      - name: 上传结果
+        uses: actions/upload-artifact@v4
+        with:
+          name: kpm文件
+          path: cpuinfo-exynos2600.kpm
